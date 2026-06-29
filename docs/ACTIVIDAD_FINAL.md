@@ -1,37 +1,30 @@
 # Actividad final: rescate en un mapa con obstáculos
 
-## Situación
+## ## Producto esperado
 
-Una persona debe llegar desde un punto de inicio `S` hasta una zona segura `G`. El mapa contiene obstáculos representados con `#`. Cada equipo debe diseñar un mapa y probar BFS, DFS y A*.
-
-## Tarea
-
-1. Crear un mapa de al menos 8 filas por 8 columnas.
-2. Incluir mínimo 10 obstáculos.
-3. Ejecutar BFS, DFS y A*.
-4. Comparar los caminos encontrados.
-5. Activar modo `debug=True` en al menos un algoritmo.
-6. Explicar qué algoritmo fue más conveniente y por qué.
-
-## Producto esperado
-
-El repositorio debe incluir:
-
-- Archivo `.txt` con el mapa.
-- Código Python funcional.
-- Captura o salida de consola.
 - Tabla comparativa:
 
 | Algoritmo | ¿Encontró camino? | Longitud del camino | Observación |
-|---|---|---:|---|
-| BFS |  |  |  |
-| DFS |  |  |  |
-| A* |  |  |  |
+| :--- | :--- | :--- | :--- |
+| **BFS** | Sí | 15 pasos | Elian Valenzuela: Encuentra de forma garantizada la ruta más corta. Sin embargo, al revisar en capas radiales (como anillos), explora muchas casillas vacías innecesarias antes de dar con la meta. |
+| **DFS** | Sí | 19 pasos | Felipe Campos: No garantiza el camino más corto. Como se va de cabeza por una sola rama hasta el fondo usando una pila, dio una vuelta más larga rodeando los obstáculos superiores antes de bajar a la meta. |
+| **A\*** | Sí | 15 pasos | Johan Oña: Encuentra la ruta óptima (igual de corta que BFS) pero de manera mucho más rápida y directa, ya que usa la distancia Manhattan como brújula para no desviarse hacia zonas muertas. |
 
-## Reflexión final
+---
 
-Escribe un párrafo de 150 a 250 palabras respondiendo:
+## ## Reflexión final
 
-- ¿Cuál fue el error más difícil de depurar?
-- ¿Qué aprendiste sobre frontera, visitados y padres?
-- ¿Por qué A* puede ser más eficiente que BFS?
+Durante el desarrollo de este taller, el error más complejo de depurar fue controlar el momento exacto en el que se marcan los nodos como visitados; un retraso en este registro provocaba que la frontera repitiera elementos, generando bucles redundantes. Con respecto a las estructuras de control, aprendimos que la frontera actúa como el motor del algoritmo: en BFS funciona como una cola (FIFO) expandiendo el mapa de forma equitativa, en DFS opera como una pila (LIFO) explorando líneas profundas, mientras que el conjunto de visitados y el diccionario de padres son indispensables para evitar ciclos infinitos y reconstruir la ruta de retorno al origen. Finalmente, confirmamos que A* es drásticamente más eficiente que BFS en entornos con obstáculos debido a que no realiza una búsqueda a ciegas; al incorporar la heurística de la distancia Manhattan ($f(n) = g(n) + h(n)$), el algoritmo estima matemáticamente la cercanía real hacia la meta 'G', priorizando únicamente los caminos que avanzan en la dirección correcta y descartando rutas innecesarias.
+
+---
+
+## 📸 Evidencias de Ejecución Individual
+
+### 1. BFS - Elian Valenzuela
+![Evidencia BFS](evidencia_elian_bfs.png)
+
+### 2. DFS - Felipe Campos
+![Evidencia DFS](evidencia_felipe_dfs.png)
+
+### 3. A* - Johan Oña
+![Evidencia A*](evidencia_johan_astar.png)
