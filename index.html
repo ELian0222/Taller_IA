@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asistente de CV & IA</title>
+<style>
+    body { font-family: Arial, sans-serif; background-color: #f4f4f9; margin: 0; padding: 20px; display: flex; justify-content: center; }
+    .container { width: 100%; max-width: 600px; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+    h1 { color: #333; font-size: 24px; text-align: center; }
+    
+    /* Corrección clave aquí: display flex y flex-direction column */
+    .chat-box { height: 350px; border: 1px solid #ddd; border-radius: 4px; padding: 10px; overflow-y: scroll; margin-bottom: 15px; background: #fafafa; display: flex; flex-direction: column; gap: 10px; }
+    
+    .input-group { display: flex; gap: 10px; }
+    input[type="text"] { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px; font-size: 16px; }
+    button { padding: 10px 20px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
+    button:hover { background: #0056b3; }
+    
+    .message { padding: 10px 14px; border-radius: 8px; max-width: 75%; word-break: break-word; line-height: 1.4; }
+    .user-message { background: #007bff; color: white; margin-left: auto; text-align: right; }
+    .bot-message { background: #e2e8f0; color: #333; margin-right: auto; }
+    .loading { font-style: italic; color: #666; }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>🤖 Asistente de CV & IA</h1>
+    <div class="chat-box" id="chatBox">
+        <div class="message bot-message">¡Hola! Pregúntame lo que quieras sobre mi CV.</div>
+    </div>
+    <div class="input-group">
+        <input type="text" id="userInput" placeholder="Escribe tu pregunta aquí..." onkeypress="handleKeyPress(event)">
+        <button onclick="sendMessage()" id="sendBtn">Enviar</button>
+    </div>
+</div>
+
+<script>
+    async function sendMessage() {
+        const input = document.getElementById('userInput');
+        const chatBox = document.getElementById('chatBox');
+        const sendBtn = document.getElementById('sendBtn');
+        const text = input.value.trim();
+
+        if (text === "") return;
+
+        // Mostrar mensaje del usuario
+        const userDiv = document.createElement('div');
+        userDiv.className = 'message user-message';
+        userDiv.textContent = text;
+        chatBox.appendChild(userDiv);
+
+        input.value = "";
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        // Desactivar input y mostrar estado de carga
+        input.disabled = true;
+        sendBtn.disabled = true;
+
+        const loadingDiv = document.createElement('div');
+        loadingDiv.className = 'message bot-message loading';
+        loadingDiv.id = 'loadingMsg';
+        loadingDiv.textContent = "Pensando respuesta con Ollama...";
+        chatBox.appendChild(loadingDiv);
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+        try {
+            // Petición real al servidor de Flask
+            const response = await fetch('/preguntar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ pregunta: text })
+            });
+            const data = await response.json();
+
+            // Eliminar mensaje de carga
+            document.getElementById('loadingMsg').remove();
+
+            // Mostrar respuesta real del bot
+            const botDiv = document.createElement('div');
+            botDiv.className = 'message bot-message';
+            botDiv.textContent = data.respuesta;
+            chatBox.appendChild(botDiv);
+
+        } catch (error) {
+            document.getElementById('loadingMsg').remove();
+            const errorDiv = document.createElement('div');
+            errorDiv.className = 'message bot-message';
+            errorDiv.textContent = "Hubo un error al comunicarse con el servidor.";
+            chatBox.appendChild(errorDiv);
+        }
+
+        // Reactivar controles
+        input.disabled = false;
+        sendBtn.disabled = false;
+        input.focus();
+        chatBox.scrollTop = chatBox.scrollHeight;
+    }
+
+    function handleKeyPress(event) {
+        if (event.key === 'Enter') {
+            sendMessage();
+        }
+    }
+</script>
+
+</body>
+</html>
